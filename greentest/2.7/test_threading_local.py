@@ -112,7 +112,7 @@ class BaseLocalTest:
 
     def test_arguments(self):
         # Issue 1522237
-        from thread import _local as local
+        from _thread import _local as local
         from _threading_local import local as py_local
 
         for cls in (local, py_local):
@@ -214,7 +214,7 @@ def test_main():
     suite.addTest(unittest.makeSuite(PyThreadingLocalTest))
 
     try:
-        from thread import _local
+        from _thread import _local
     except ImportError:
         pass
     else:

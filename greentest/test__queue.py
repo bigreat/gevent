@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 from greentest import TestCase, main, GenericGetTestCase
 import gevent
 from gevent.hub import get_hub

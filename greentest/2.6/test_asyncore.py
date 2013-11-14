@@ -10,7 +10,7 @@ import errno
 
 from test import test_support
 from test.test_support import TESTFN, run_unittest, unlink
-from StringIO import StringIO
+from io import StringIO
 
 HOST = test_support.HOST
 

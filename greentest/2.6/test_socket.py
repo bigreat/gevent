@@ -6,10 +6,10 @@ from test import test_support
 import errno
 import socket
 import select
-import thread, threading
+import _thread, threading
 import time
 import traceback
-import Queue
+import queue
 import sys
 import os
 import array
@@ -96,14 +96,14 @@ class ThreadableTest:
         self.server_ready = threading.Event()
         self.client_ready = threading.Event()
         self.done = threading.Event()
-        self.queue = Queue.Queue(1)
+        self.queue = queue.Queue(1)
 
         # Do some munging to start the client test.
         methodname = self.id()
         i = methodname.rfind('.')
         methodname = methodname[i+1:]
         test_method = getattr(self, '_' + methodname)
-        self.client_thread = thread.start_new_thread(
+        self.client_thread = _thread.start_new_thread(
             self.clientRun, (test_method,))
 
         self.__setUp()
@@ -137,7 +137,7 @@ class ThreadableTest:
 
     def clientTearDown(self):
         self.done.set()
-        thread.exit()
+        _thread.exit()
 
 class ThreadedTCPSocketTest(SocketTCPTest, ThreadableTest):
 
@@ -299,18 +299,18 @@ class GeneralModuleTests(unittest.TestCase):
         # when looking at the lower 16 or 32 bits.
         sizes = {socket.htonl: 32, socket.ntohl: 32,
                  socket.htons: 16, socket.ntohs: 16}
-        for func, size in sizes.items():
-            mask = (1L<<size) - 1
+        for func, size in list(sizes.items()):
+            mask = (1<<size) - 1
             for i in (0, 1, 0xffff, ~0xffff, 2, 0x01234567, 0x76543210):
                 self.assertEqual(i & mask, func(func(i&mask)) & mask)
 
             swapped = func(mask)
             self.assertEqual(swapped & mask, mask)
-            self.assertRaises(OverflowError, func, 1L<<34)
+            self.assertRaises(OverflowError, func, 1<<34)
 
     def testNtoHErrors(self):
-        good_values = [ 1, 2, 3, 1L, 2L, 3L ]
-        bad_values = [ -1, -2, -3, -1L, -2L, -3L ]
+        good_values = [ 1, 2, 3, 1, 2, 3 ]
+        bad_values = [ -1, -2, -3, -1, -2, -3 ]
         for k in good_values:
             socket.ntohl(k)
             socket.ntohs(k)

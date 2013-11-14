@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
+
 import sys
 import re
 import greentest
@@ -9,6 +9,7 @@ from time import time
 import gevent
 import gevent.socket as gevent_socket
 from util import log
+import collections
 
 
 resolver = gevent.get_hub().resolver
@@ -128,7 +129,7 @@ def relaxed_is_equal(a, b):
 
 def add(klass, hostname, name=None):
 
-    call = callable(hostname)
+    call = isinstance(hostname, collections.Callable)
 
     if name is None:
         if call:
@@ -298,7 +299,7 @@ class TestFamily(TestCase):
         try:
             result = function(*args)
             raise AssertionError('%s: Expected to raise %s, instead returned %r' % (function, error, result))
-        except Exception, ex:
+        except Exception as ex:
             if isinstance(error, str):
                 repr_error = error
             else:
@@ -360,8 +361,8 @@ class Test_getaddrinfo(TestCase):
 class TestInternational(TestCase):
     pass
 
-add(TestInternational, u'президент.рф', 'russian')
-add(TestInternational, u'президент.рф'.encode('idna'), 'idna')
+add(TestInternational, 'президент.рф', 'russian')
+add(TestInternational, 'президент.рф'.encode('idna'), 'idna')
 
 
 class TestInterrupted_gethostbyname(greentest.GenericWaitTestCase):

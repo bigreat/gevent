@@ -35,7 +35,7 @@ import greentest
 from gevent import monkey; monkey.patch_all()
 
 from pprint import pformat
-from thread import start_new_thread
+from _thread import start_new_thread
 from time import sleep
 import weakref
 import gc
@@ -101,11 +101,11 @@ def run_interaction(run_client):
 def run_and_check(run_client):
     w = run_interaction(run_client=run_client)
     if w():
-        print (pformat(gc.get_referrers(w())))
+        print((pformat(gc.get_referrers(w()))))
         for x in gc.get_referrers(w()):
-            print (pformat(x))
+            print((pformat(x)))
             for y in gc.get_referrers(x):
-                print ('-', pformat(y))
+                print(('-', pformat(y)))
         raise AssertionError('server should be dead by now')
 
 

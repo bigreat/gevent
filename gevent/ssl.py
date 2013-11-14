@@ -11,7 +11,7 @@ it requires `ssl package`_ to be installed.
 .. _`ssl package`: http://pypi.python.org/pypi/ssl
 """
 
-from __future__ import absolute_import
+
 import ssl as __ssl__
 
 try:

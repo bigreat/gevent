@@ -7,7 +7,7 @@ import threading
 import asyncore
 import asynchat
 import socket
-import StringIO
+import io
 
 from unittest import TestCase
 from test import test_support
@@ -77,7 +77,7 @@ class DummyFTPHandler(asynchat.async_chat):
         asynchat.async_chat.push(self, data + '\r\n')
 
     def cmd_port(self, arg):
-        addr = map(int, arg.split(','))
+        addr = list(map(int, arg.split(',')))
         ip = '%d.%d.%d.%d' %tuple(addr[:4])
         port = (addr[4] * 256) + addr[5]
         s = socket.create_connection((ip, port), timeout=2)
@@ -322,7 +322,7 @@ class TestFTPClass(TestCase):
         self.assertEqual(''.join(received), RETR_DATA.replace('\r\n', ''))
 
     def test_storbinary(self):
-        f = StringIO.StringIO(RETR_DATA)
+        f = io.StringIO(RETR_DATA)
         self.client.storbinary('stor', f)
         self.assertEqual(self.server.handler.last_received_data, RETR_DATA)
         # test new callback arg
@@ -332,7 +332,7 @@ class TestFTPClass(TestCase):
         self.assertTrue(flag)
 
     def test_storlines(self):
-        f = StringIO.StringIO(RETR_DATA.replace('\r\n', '\n'))
+        f = io.StringIO(RETR_DATA.replace('\r\n', '\n'))
         self.client.storlines('stor', f)
         self.assertEqual(self.server.handler.last_received_data, RETR_DATA)
         # test new callback arg

@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 
 # package is named greentest, not test, so it won't be confused with test in stdlib
-from __future__ import with_statement
+
 import sys
 import unittest
 from unittest import TestCase as BaseTestCase
@@ -187,7 +187,7 @@ class TestCaseMetaClass(type):
                 timeout *= 6
         check_totalrefcount = _get_class_attr(classDict, bases, 'check_totalrefcount', True)
         error_fatal = _get_class_attr(classDict, bases, 'error_fatal', True)
-        for key, value in classDict.items():
+        for key, value in list(classDict.items()):
             if key.startswith('test') and hasattr(value, '__call__'):
                 classDict.pop(key)
                 #value = wrap_switch_count_check(value)

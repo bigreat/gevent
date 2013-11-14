@@ -132,7 +132,7 @@ class Greenlet(greenlet):
             if self.args:
                 args = [repr(x)[:50] for x in self.args]
             if self.kwargs:
-                args.extend(['%s=%s' % (key, repr(value)[:50]) for (key, value) in self.kwargs.items()])
+                args.extend(['%s=%s' % (key, repr(value)[:50]) for (key, value) in list(self.kwargs.items())])
             if args:
                 result += '(' + ', '.join(args) + ')'
             # it is important to save the result here, because once the greenlet exits '_run' attribute will be removed

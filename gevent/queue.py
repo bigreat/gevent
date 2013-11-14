@@ -20,13 +20,13 @@ means repeatedly calling :meth:`get <Queue.get>` until :meth:`get <Queue.get>` r
     2
 """
 
-from __future__ import absolute_import
+
 import sys
 import heapq
 import collections
 
 if sys.version_info[0] == 2:
-    import Queue as __queue__
+    import queue as __queue__
 else:
     import queue as __queue__
 Full = __queue__.Full

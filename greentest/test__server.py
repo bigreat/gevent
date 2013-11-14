@@ -17,7 +17,7 @@ class SimpleStreamServer(StreamServer):
         try:
             method, path, rest = request_line.split(' ', 3)
         except Exception:
-            print ('Failed to parse request line: %r' % (request_line, ))
+            print(('Failed to parse request line: %r' % (request_line, )))
             raise
         if path == '/ping':
             client_socket.sendall('HTTP/1.0 200 OK\r\n\r\nPONG')

@@ -1,6 +1,6 @@
 # Copyright (c) 2009-2012 Denis Bilenko. See LICENSE for details.
 
-from __future__ import absolute_import
+
 import sys
 import os
 import traceback
@@ -34,18 +34,18 @@ if PY3:
     string_types = str,
     integer_types = int,
 else:
-    string_types = basestring,
-    integer_types = (int, long)
+    string_types = str,
+    integer_types = (int, int)
 
 
 if sys.version_info[0] <= 2:
-    import thread
+    import _thread
 else:
     import _thread as thread
-threadlocal = thread._local
+threadlocal = _thread._local
 _threadlocal = threadlocal()
 _threadlocal.Hub = None
-get_ident = thread.get_ident
+get_ident = _thread.get_ident
 MAIN_THREAD = get_ident()
 
 

@@ -2,7 +2,7 @@ import os
 import unittest
 import random
 from test import test_support
-import thread
+import _thread
 import time
 import sys
 
@@ -12,7 +12,7 @@ NUMTASKS = 10
 NUMTRIPS = 3
 
 
-_print_mutex = thread.allocate_lock()
+_print_mutex = _thread.allocate_lock()
 
 def verbose_print(arg):
     """Helper function for printing out debugging output."""
@@ -24,10 +24,10 @@ def verbose_print(arg):
 class BasicThreadTest(unittest.TestCase):
 
     def setUp(self):
-        self.done_mutex = thread.allocate_lock()
+        self.done_mutex = _thread.allocate_lock()
         self.done_mutex.acquire()
-        self.running_mutex = thread.allocate_lock()
-        self.random_mutex = thread.allocate_lock()
+        self.running_mutex = _thread.allocate_lock()
+        self.random_mutex = _thread.allocate_lock()
         self.created = 0
         self.running = 0
         self.next_ident = 0
@@ -39,7 +39,7 @@ class ThreadRunningTests(BasicThreadTest):
         with self.running_mutex:
             self.next_ident += 1
             verbose_print("creating task %s" % self.next_ident)
-            thread.start_new_thread(self.task, (self.next_ident,))
+            _thread.start_new_thread(self.task, (self.next_ident,))
             self.created += 1
             self.running += 1
 
@@ -64,21 +64,21 @@ class ThreadRunningTests(BasicThreadTest):
 
     def test_stack_size(self):
         # Various stack size tests.
-        self.assertEquals(thread.stack_size(), 0, "intial stack size is not 0")
+        self.assertEquals(_thread.stack_size(), 0, "intial stack size is not 0")
 
-        thread.stack_size(0)
-        self.assertEquals(thread.stack_size(), 0, "stack_size not reset to default")
+        _thread.stack_size(0)
+        self.assertEquals(_thread.stack_size(), 0, "stack_size not reset to default")
 
         if os.name not in ("nt", "os2", "posix"):
             return
 
         tss_supported = True
         try:
-            thread.stack_size(4096)
+            _thread.stack_size(4096)
         except ValueError:
             verbose_print("caught expected ValueError setting "
                             "stack_size(4096)")
-        except thread.error:
+        except _thread.error:
             tss_supported = False
             verbose_print("platform does not support changing thread stack "
                             "size")
@@ -86,8 +86,8 @@ class ThreadRunningTests(BasicThreadTest):
         if tss_supported:
             fail_msg = "stack_size(%d) failed - should succeed"
             for tss in (262144, 0x100000, 0):
-                thread.stack_size(tss)
-                self.assertEquals(thread.stack_size(), tss, fail_msg % tss)
+                _thread.stack_size(tss)
+                self.assertEquals(_thread.stack_size(), tss, fail_msg % tss)
                 verbose_print("successfully set stack_size(%d)" % tss)
 
             for tss in (262144, 0x100000):
@@ -101,15 +101,15 @@ class ThreadRunningTests(BasicThreadTest):
                 self.done_mutex.acquire()
                 verbose_print("all tasks done")
 
-            thread.stack_size(0)
+            _thread.stack_size(0)
 
 
 class Barrier:
     def __init__(self, num_threads):
         self.num_threads = num_threads
         self.waiting = 0
-        self.checkin_mutex  = thread.allocate_lock()
-        self.checkout_mutex = thread.allocate_lock()
+        self.checkin_mutex  = _thread.allocate_lock()
+        self.checkout_mutex = _thread.allocate_lock()
         self.checkout_mutex.acquire()
 
     def enter(self):
@@ -135,7 +135,7 @@ class BarrierTest(BasicThreadTest):
         self.bar = Barrier(NUMTASKS)
         self.running = NUMTASKS
         for i in range(NUMTASKS):
-            thread.start_new_thread(self.task2, (i,))
+            _thread.start_new_thread(self.task2, (i,))
         verbose_print("waiting for tasks to end")
         self.done_mutex.acquire()
         verbose_print("tasks done")
@@ -167,7 +167,7 @@ class BarrierTest(BasicThreadTest):
 
 
 class LockTests(lock_tests.LockTests):
-    locktype = thread.allocate_lock
+    locktype = _thread.allocate_lock
 
 
 class TestForkInThread(unittest.TestCase):
@@ -188,7 +188,7 @@ class TestForkInThread(unittest.TestCase):
             else: # parent
                 os.close(self.write_fd)
 
-        thread.start_new_thread(thread1, ())
+        _thread.start_new_thread(thread1, ())
         self.assertEqual(os.read(self.read_fd, 2), "OK",
                          "Unable to fork() in thread")
 

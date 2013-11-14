@@ -31,7 +31,7 @@ For convenience, exceptions (like :class:`error <socket.error>` and :class:`time
 as well as the constants from :mod:`socket` module are imported into this module.
 """
 
-from __future__ import absolute_import
+
 
 # standard functions and classes that this module re-implements in a gevent-aware way:
 __implements__ = ['create_connection',
@@ -448,7 +448,7 @@ class socket(object):
                 raise
 
     def sendall(self, data, flags=0):
-        if isinstance(data, unicode):
+        if isinstance(data, str):
             data = data.encode()
         # this sendall is also reused by gevent.ssl.SSLSocket subclass,
         # so it should not call self._sock methods directly

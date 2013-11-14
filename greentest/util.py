@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 import sys
 import os
 import re
@@ -153,7 +153,7 @@ class RunResult(object):
         self.output = output
         self.name = name
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.code)
 
     def __int__(self):
@@ -266,7 +266,7 @@ def match_environ(expected_environ, actual_environ):
         actual_environ = actual_environ.split()
     expected_environ = dict(x.split('=') for x in expected_environ)
     actual_environ = dict(x.split('=') for x in actual_environ)
-    for key, expected_value in expected_environ.items():
+    for key, expected_value in list(expected_environ.items()):
         value = actual_environ.pop(key, None)
         if value is not None and value != expected_value:
             return False

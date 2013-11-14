@@ -1,7 +1,7 @@
 import socket
 import telnetlib
 import time
-import Queue
+import queue
 
 from unittest import TestCase
 from test import test_support
@@ -93,7 +93,7 @@ class GeneralTests(TestCase):
 
 def _read_setUp(self):
     self.evt = threading.Event()
-    self.dataq = Queue.Queue()
+    self.dataq = queue.Queue()
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.sock.settimeout(10)
     self.port = test_support.bind_port(self.sock)

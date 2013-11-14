@@ -1,4 +1,4 @@
-from __future__ import nested_scopes    # Backward compat for 2.1
+    # Backward compat for 2.1
 from unittest import TestSuite, TestCase, makeSuite
 from wsgiref.util import setup_testing_defaults
 from wsgiref.headers import Headers
@@ -7,8 +7,8 @@ from wsgiref import util
 from wsgiref.validate import validator
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, demo_app
 from wsgiref.simple_server import make_server
-from StringIO import StringIO
-from SocketServer import BaseServer
+from io import StringIO
+from socketserver import BaseServer
 import re, sys
 
 
@@ -332,10 +332,10 @@ class HeaderTests(TestCase):
         test = [('x','y')]
         self.assertEqual(len(Headers([])),0)
         self.assertEqual(len(Headers(test[:])),1)
-        self.assertEqual(Headers(test[:]).keys(), ['x'])
-        self.assertEqual(Headers(test[:]).values(), ['y'])
-        self.assertEqual(Headers(test[:]).items(), test)
-        self.failIf(Headers(test).items() is test)  # must be copy!
+        self.assertEqual(list(Headers(test[:]).keys()), ['x'])
+        self.assertEqual(list(Headers(test[:]).values()), ['y'])
+        self.assertEqual(list(Headers(test[:]).items()), test)
+        self.failIf(list(Headers(test).items()) is test)  # must be copy!
 
         h=Headers([])
         del h['foo']   # should not raise an error
@@ -423,11 +423,11 @@ class HandlerTests(TestCase):
         empty = {}; setup_testing_defaults(empty)
         env = handler.environ
         from os import environ
-        for k,v in environ.items():
+        for k,v in list(environ.items()):
             if not k in empty:
                 self.assertEqual(env[k],v)
-        for k,v in empty.items():
-            self.failUnless(env.has_key(k))
+        for k,v in list(empty.items()):
+            self.failUnless(k in env)
 
     def testEnviron(self):
         h = TestHandler(X="Y")
@@ -440,7 +440,7 @@ class HandlerTests(TestCase):
         h = BaseCGIHandler(None,None,None,{})
         h.setup_environ()
         for key in 'wsgi.url_scheme', 'wsgi.input', 'wsgi.errors':
-            self.assert_(h.environ.has_key(key))
+            self.assert_(key in h.environ)
 
     def testScheme(self):
         h=TestHandler(HTTPS="on"); h.setup_environ()

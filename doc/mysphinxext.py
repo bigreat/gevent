@@ -39,15 +39,15 @@ def missing_reference(app, env, node, contnode):
         return newnode
 
     if noisy >= 1:
-        print ('Looking for %s' % [type, target, modname, classname])
+        print(('Looking for %s' % [type, target, modname, classname]))
         print (node)
 
-    for docname, items in env.indexentries.items():
+    for docname, items in list(env.indexentries.items()):
         if noisy >= 2:
             print (docname)
         for (i_type, i_string, i_target, i_aliasname) in items:
             if noisy >= 3:
-                print ('---', [i_type, i_string, i_target, i_aliasname])
+                print(('---', [i_type, i_string, i_target, i_aliasname]))
             if i_aliasname.endswith(target):
                 stripped_aliasname = i_aliasname[len(docname):]
                 if stripped_aliasname:
@@ -55,11 +55,11 @@ def missing_reference(app, env, node, contnode):
                     stripped_aliasname = stripped_aliasname[1:]
                     if stripped_aliasname == target:
                         if noisy >= 1:
-                            print ('--- found %s %s in %s' % (type, target, i_aliasname))
+                            print(('--- found %s %s in %s' % (type, target, i_aliasname)))
                         return new_reference(docname + '.html#' + i_aliasname, i_aliasname)
 
     if type == 'mod':
-        modules = [x for x in env.indexentries.keys() if x.startswith('gevent.')]
+        modules = [x for x in list(env.indexentries.keys()) if x.startswith('gevent.')]
         target = 'gevent.' + target
         if target in modules:
             return new_reference(target + '.html', target)

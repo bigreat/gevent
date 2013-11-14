@@ -18,7 +18,7 @@ import urllib.request
 import urllib.error
 from urllib.parse import urlparse
 from cgi import escape
-from urllib import unquote
+from urllib.parse import unquote
 
 LISTEN = ":8088"
 
@@ -51,11 +51,11 @@ def proxy(path, start_response, proxy_url):
         path = 'http://' + path
     try:
         try:
-            response = urllib2.urlopen(path)
-        except urllib2.HTTPError:
+            response = urllib.request.urlopen(path)
+        except urllib.error.HTTPError:
             response = sys.exc_info()[1]
-        print ('%s: %s %s' % (path, response.code, response.msg))
-        headers = [(k, v) for (k, v) in response.headers.items() if k not in drop_headers]
+        print(('%s: %s %s' % (path, response.code, response.msg)))
+        headers = [(k, v) for (k, v) in list(response.headers.items()) if k not in drop_headers]
         scheme, netloc, path, params, query, fragment = urlparse(path)
         host = (scheme or 'http') + '://' + netloc
     except Exception:
@@ -124,5 +124,5 @@ FORM = """<html><head>
 
 if __name__ == '__main__':
     from gevent.pywsgi import WSGIServer
-    print ('Serving on %s...' % LISTEN)
+    print(('Serving on %s...' % LISTEN))
     WSGIServer(LISTEN, application).serve_forever()

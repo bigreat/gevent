@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import threading
-import urlparse
-import urllib2
-import BaseHTTPServer
+import urllib.parse
+import urllib.request, urllib.error, urllib.parse
+import http.server
 import unittest
 import hashlib
 from test import test_support
@@ -11,13 +11,13 @@ mimetools = test_support.import_module('mimetools', deprecated=True)
 
 # Loopback http server infrastructure
 
-class LoopbackHttpServer(BaseHTTPServer.HTTPServer):
+class LoopbackHttpServer(http.server.HTTPServer):
     """HTTP server w/ a few modifications that make it useful for
     loopback testing purposes.
     """
 
     def __init__(self, server_address, RequestHandlerClass):
-        BaseHTTPServer.HTTPServer.__init__(self,
+        http.server.HTTPServer.__init__(self,
                                            server_address,
                                            RequestHandlerClass)
 
@@ -188,7 +188,7 @@ class DigestAuthHandler:
 
 # Proxy test infrastructure
 
-class FakeProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class FakeProxyHandler(http.server.BaseHTTPRequestHandler):
     """This is a 'fake proxy' that makes it look like the entire
     internet has gone down due to a sudden zombie invasion.  It main
     utility is in providing us with authentication support for
@@ -203,7 +203,7 @@ class FakeProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         pass
 
     def do_GET(self):
-        (scm, netloc, path, params, query, fragment) = urlparse.urlparse(
+        (scm, netloc, path, params, query, fragment) = urllib.parse.urlparse(
             self.path, 'http')
         self.short_path = path
         if self.digest_auth_handler.handle_request(self):
@@ -233,9 +233,9 @@ class ProxyAuthTests(unittest.TestCase):
         self.server.start()
         self.server.ready.wait()
         proxy_url = "http://127.0.0.1:%d" % self.server.port
-        handler = urllib2.ProxyHandler({"http" : proxy_url})
-        self._digest_auth_handler = urllib2.ProxyDigestAuthHandler()
-        self.opener = urllib2.build_opener(handler, self._digest_auth_handler)
+        handler = urllib.request.ProxyHandler({"http" : proxy_url})
+        self._digest_auth_handler = urllib.request.ProxyDigestAuthHandler()
+        self.opener = urllib.request.build_opener(handler, self._digest_auth_handler)
 
     def tearDown(self):
         self.server.stop()
@@ -244,13 +244,13 @@ class ProxyAuthTests(unittest.TestCase):
         self._digest_auth_handler.add_password(self.REALM, self.URL,
                                                self.USER, self.PASSWD+"bad")
         FakeProxyHandler.digest_auth_handler.set_qop("auth")
-        self.assertRaises(urllib2.HTTPError,
+        self.assertRaises(urllib.error.HTTPError,
                           self.opener.open,
                           self.URL)
 
     def test_proxy_with_no_password_raises_httperror(self):
         FakeProxyHandler.digest_auth_handler.set_qop("auth")
-        self.assertRaises(urllib2.HTTPError,
+        self.assertRaises(urllib.error.HTTPError,
                           self.opener.open,
                           self.URL)
 
@@ -269,7 +269,7 @@ class ProxyAuthTests(unittest.TestCase):
         FakeProxyHandler.digest_auth_handler.set_qop("auth-int")
         try:
             result = self.opener.open(self.URL)
-        except urllib2.URLError:
+        except urllib.error.URLError:
             # It's okay if we don't support auth-int, but we certainly
             # shouldn't receive any kind of exception here other than
             # a URLError.
@@ -282,7 +282,7 @@ class ProxyAuthTests(unittest.TestCase):
 
 def GetRequestHandler(responses):
 
-    class FakeHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    class FakeHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
 
         server_version = "TestHTTP/"
         requests = []
@@ -352,7 +352,7 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server(responses)
 
         try:
-            f = urllib2.urlopen('http://localhost:%s/' % handler.port)
+            f = urllib.request.urlopen('http://localhost:%s/' % handler.port)
             data = f.read()
             f.close()
 
@@ -368,8 +368,8 @@ class TestUrlopen(unittest.TestCase):
 
         try:
             try:
-                urllib2.urlopen('http://localhost:%s/weeble' % handler.port)
-            except urllib2.URLError as f:
+                urllib.request.urlopen('http://localhost:%s/weeble' % handler.port)
+            except urllib.error.URLError as f:
                 pass
             else:
                 self.fail('404 should raise URLError')
@@ -388,7 +388,7 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server([(200, [], expected_response)])
 
         try:
-            f = urllib2.urlopen('http://localhost:%s/bizarre' % handler.port)
+            f = urllib.request.urlopen('http://localhost:%s/bizarre' % handler.port)
             data = f.read()
             f.close()
 
@@ -402,7 +402,7 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server([(200, [], expected_response)])
 
         try:
-            f = urllib2.urlopen('http://localhost:%s/bizarre' % handler.port, 'get=with_feeling')
+            f = urllib.request.urlopen('http://localhost:%s/bizarre' % handler.port, 'get=with_feeling')
             data = f.read()
             f.close()
 
@@ -416,9 +416,9 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server([(200, [], "we don't care")])
 
         try:
-            req = urllib2.Request("http://localhost:%s/" % handler.port,
+            req = urllib.request.Request("http://localhost:%s/" % handler.port,
                                   headers={'Range': 'bytes=20-39'})
-            urllib2.urlopen(req)
+            urllib.request.urlopen(req)
             self.assertEqual(handler.headers_received['Range'], 'bytes=20-39')
         finally:
             self.server.stop()
@@ -427,7 +427,7 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server([(200, [], "we don't care")])
 
         try:
-            open_url = urllib2.urlopen("http://localhost:%s" % handler.port)
+            open_url = urllib.request.urlopen("http://localhost:%s" % handler.port)
             for attr in ("read", "close", "info", "geturl"):
                 self.assert_(hasattr(open_url, attr), "object returned from "
                              "urlopen lacks the %s attribute" % attr)
@@ -442,7 +442,7 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server([(200, [], "we don't care")])
 
         try:
-            open_url = urllib2.urlopen("http://localhost:%s" % handler.port)
+            open_url = urllib.request.urlopen("http://localhost:%s" % handler.port)
             info_obj = open_url.info()
             self.assert_(isinstance(info_obj, mimetools.Message),
                          "object returned by 'info' is not an instance of "
@@ -456,7 +456,7 @@ class TestUrlopen(unittest.TestCase):
         handler = self.start_server([(200, [], "we don't care")])
 
         try:
-            open_url = urllib2.urlopen("http://localhost:%s" % handler.port)
+            open_url = urllib.request.urlopen("http://localhost:%s" % handler.port)
             url = open_url.geturl()
             self.assertEqual(url, "http://localhost:%s" % handler.port)
         finally:
@@ -484,7 +484,7 @@ class TestUrlopen(unittest.TestCase):
                           # failing if the ISP hijacks all invalid domain
                           # requests.  The real solution would be to be able to
                           # parameterize the framework with a mock resolver.
-                          urllib2.urlopen, "http://sadflkjsasf.i.nvali.d./")
+                          urllib.request.urlopen, "http://sadflkjsasf.i.nvali.d./")
 
 
 def test_main():

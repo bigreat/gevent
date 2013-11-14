@@ -73,7 +73,7 @@ def test_main():
     suite = DocTestSuite('_threading_local')
 
     try:
-        from thread import _local
+        from _thread import _local
     except ImportError:
         pass
     else:

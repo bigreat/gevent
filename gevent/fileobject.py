@@ -1,4 +1,4 @@
-from __future__ import absolute_import, with_statement
+
 import sys
 import os
 from gevent.hub import get_hub
@@ -209,7 +209,7 @@ class FileObjectThread(object):
         self.threadpool = kwargs.pop('threadpool', None)
         self.lock = kwargs.pop('lock', True)
         if kwargs:
-            raise TypeError('Unexpected arguments: %r' % kwargs.keys())
+            raise TypeError('Unexpected arguments: %r' % list(kwargs.keys()))
         if self.lock is True:
             self.lock = Semaphore()
         elif not self.lock:
@@ -291,7 +291,7 @@ class FileObjectBlock(object):
     def __init__(self, fobj, *args, **kwargs):
         self._close = kwargs.pop('close', True)
         if kwargs:
-            raise TypeError('Unexpected arguments: %r' % kwargs.keys())
+            raise TypeError('Unexpected arguments: %r' % list(kwargs.keys()))
         if isinstance(fobj, (int)):
             if not self._close:
                 # we cannot do this, since fdopen object will close the descriptor

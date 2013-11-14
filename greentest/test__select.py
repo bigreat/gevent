@@ -30,13 +30,13 @@ class TestSelectTypes(greentest.TestCase):
         select.select([int(sock.fileno())], [], [], 0.001)
 
     try:
-        long
+        int
     except NameError:
         pass
     else:
         def test_long(self):
             sock = socket.socket()
-            select.select([long(sock.fileno())], [], [], 0.001)
+            select.select([int(sock.fileno())], [], [], 0.001)
 
     def test_string(self):
         self.switch_expected = False

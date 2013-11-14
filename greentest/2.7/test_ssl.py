@@ -11,14 +11,14 @@ import gc
 import os
 import errno
 import pprint
-import urllib, urlparse
+import urllib.request, urllib.parse, urllib.error, urllib.parse
 import traceback
 import weakref
 import functools
 import platform
 
-from BaseHTTPServer import HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
+from http.server import HTTPServer
+from http.server import SimpleHTTPRequestHandler
 
 ssl = test_support.import_module("ssl")
 
@@ -111,12 +111,12 @@ class BasicSocketTests(unittest.TestCase):
         if test_support.verbose:
             sys.stdout.write("\n" + pprint.pformat(p) + "\n")
         self.assertEqual(p['subject'],
-                         ((('countryName', u'US'),),
-                          (('stateOrProvinceName', u'Delaware'),),
-                          (('localityName', u'Wilmington'),),
-                          (('organizationName', u'Python Software Foundation'),),
-                          (('organizationalUnitName', u'SSL'),),
-                          (('commonName', u'somemachine.python.org'),)),
+                         ((('countryName', 'US'),),
+                          (('stateOrProvinceName', 'Delaware'),),
+                          (('localityName', 'Wilmington'),),
+                          (('organizationName', 'Python Software Foundation'),),
+                          (('organizationalUnitName', 'SSL'),),
+                          (('commonName', 'somemachine.python.org'),)),
                         )
         # Issue #13034: the subjectAltName in some certificates
         # (notably projects.developer.nokia.com:443) wasn't parsed
@@ -318,7 +318,7 @@ class NetworkedTests(unittest.TestCase):
                     count += 1
                     s.do_handshake()
                     break
-                except ssl.SSLError, err:
+                except ssl.SSLError as err:
                     if err.args[0] == ssl.SSL_ERROR_WANT_READ:
                         select.select([s], [], [])
                     elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
@@ -594,14 +594,14 @@ else:
                 def _do_ssl_handshake(self):
                     try:
                         self.socket.do_handshake()
-                    except ssl.SSLError, err:
+                    except ssl.SSLError as err:
                         if err.args[0] in (ssl.SSL_ERROR_WANT_READ,
                                            ssl.SSL_ERROR_WANT_WRITE):
                             return
                         elif err.args[0] == ssl.SSL_ERROR_EOF:
                             return self.handle_close()
                         raise
-                    except socket.error, err:
+                    except socket.error as err:
                         if err.args[0] == errno.ECONNABORTED:
                             return self.handle_close()
                     else:
@@ -721,10 +721,10 @@ else:
 
                 """
                 # abandon query parameters
-                path = urlparse.urlparse(path)[2]
-                path = os.path.normpath(urllib.unquote(path))
+                path = urllib.parse.urlparse(path)[2]
+                path = os.path.normpath(urllib.parse.unquote(path))
                 words = path.split('/')
-                words = filter(None, words)
+                words = [_f for _f in words if _f]
                 path = self.root
                 for word in words:
                     drive, word = os.path.splitdrive(word)
@@ -785,10 +785,10 @@ else:
                                     certfile=certfile,
                                     ssl_version=ssl.PROTOCOL_TLSv1)
                 s.connect((HOST, server.port))
-            except ssl.SSLError, x:
+            except ssl.SSLError as x:
                 if test_support.verbose:
                     sys.stdout.write("\nSSLError is %s\n" % x[1])
-            except socket.error, x:
+            except socket.error as x:
                 if test_support.verbose:
                     sys.stdout.write("\nsocket.error is %s\n" % x[1])
             else:
@@ -1111,7 +1111,7 @@ else:
                 url = 'https://127.0.0.1:%d/%s' % (
                     server.port, os.path.split(CERTFILE)[1])
                 with test_support.check_py3k_warnings():
-                    f = urllib.urlopen(url)
+                    f = urllib.request.urlopen(url)
                 dlen = f.info().getheader("content-length")
                 if dlen and (int(dlen) > 0):
                     d2 = f.read(int(dlen))
@@ -1203,7 +1203,7 @@ else:
                     ('recv_into', _recv_into, True, []),
                     ('recvfrom_into', _recvfrom_into, False, []),
                 ]
-                data_prefix = u"PREFIX_"
+                data_prefix = "PREFIX_"
 
                 for meth_name, send_meth, expect_success, args in send_methods:
                     indata = data_prefix + meth_name

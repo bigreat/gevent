@@ -47,14 +47,14 @@ if __name__ == '__main__':
             if re.search('^\s*>>> ', open(path).read(), re.M):
                 try:
                     s = doctest.DocTestSuite(m, extraglobs=globs)
-                    print ('%s (from %s): %s tests' % (m, path, len(s._tests)))
+                    print(('%s (from %s): %s tests' % (m, path, len(s._tests))))
                     suite.addTest(s)
                     modules_count += 1
                     tests_count += len(s._tests)
                 except Exception:
                     traceback.print_exc()
                     sys.stderr.write('Failed to process %s\n\n' % path)
-        print ('Total: %s tests in %s modules' % (tests_count, modules_count))
+        print(('Total: %s tests in %s modules' % (tests_count, modules_count)))
         runner = unittest.TextTestRunner(verbosity=2)
         runner.run(suite)
     finally:

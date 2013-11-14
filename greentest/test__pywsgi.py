@@ -23,7 +23,7 @@ monkey.patch_all(thread=False)
 import cgi
 import os
 import sys
-import StringIO
+import io
 try:
     from wsgiref.validate import validator
 except ImportError:
@@ -71,9 +71,9 @@ def read_headers(fd):
         try:
             key, value = line.split(': ', 1)
         except:
-            print ('Failed to split: %r' % (line, ))
+            print(('Failed to split: %r' % (line, )))
             raise
-        assert key.lower() not in [x.lower() for x in headers.keys()], 'Header %r:%r sent more than once: %r' % (key, value, headers)
+        assert key.lower() not in [x.lower() for x in list(headers.keys())], 'Header %r:%r sent more than once: %r' % (key, value, headers)
         headers[key] = value
     return response_line, headers
 
@@ -85,7 +85,7 @@ def iread_chunks(fd):
         try:
             chunk_size = int(chunk_size, 16)
         except:
-            print ('Failed to parse chunk size: %r' % line)
+            print(('Failed to parse chunk size: %r' % line))
             raise
         if chunk_size == 0:
             crlf = fd.read(2)
@@ -107,7 +107,7 @@ class Response(object):
         try:
             version, code, self.reason = status_line[:-2].split(' ', 2)
         except Exception:
-            print ('Error: %r' % status_line)
+            print(('Error: %r' % status_line))
             raise
         self.code = int(code)
         HTTP, self.version = version.split('/')
@@ -173,7 +173,7 @@ class Response(object):
             else:
                 self.body = fd.read()
         except:
-            print ('Response.read failed to read the body:\n%s' % self)
+            print(('Response.read failed to read the body:\n%s' % self))
             raise
         if body is not None:
             self.assertBody(body)
@@ -192,13 +192,13 @@ class DebugFileObject(object):
     def read(self, *args):
         result = self.obj.read(*args)
         if DEBUG:
-            print (repr(result))
+            print((repr(result)))
         return result
 
     def readline(self, *args):
         result = self.obj.readline(*args)
         if DEBUG:
-            print (repr(result))
+            print((repr(result)))
         return result
 
     def __getattr__(self, item):
@@ -922,7 +922,7 @@ class ChunkedInputTests(TestCase):
     def test_short_read_with_zero_content_length(self):
         body = self.body()
         req = "POST /short-read HTTP/1.1\r\ntransfer-encoding: Chunked\r\nContent-Length:0\r\n\r\n" + body
-        print ("REQUEST:", repr(req))
+        print(("REQUEST:", repr(req)))
 
         fd = self.connect().makefile(bufsize=1)
         fd.write(req)
@@ -1067,7 +1067,7 @@ class TestInvalidEnviron(TestCase):
     # check that WSGIServer does not insert any default values for CONTENT_LENGTH
 
     def application(self, environ, start_response):
-        for key, value in environ.items():
+        for key, value in list(environ.items()):
             if key in ('CONTENT_LENGTH', 'CONTENT_TYPE') or key.startswith('HTTP_'):
                 if key != 'HTTP_HOST':
                     raise AssertionError('Unexpected environment variable: %s=%r' % (key, value))
@@ -1160,7 +1160,7 @@ class TestInputRaw(greentest.BaseTestCase):
             data = chunk_encode(data)
             chunked_input = True
 
-        return Input(StringIO.StringIO(data), content_length=content_length, chunked_input=chunked_input)
+        return Input(io.StringIO(data), content_length=content_length, chunked_input=chunked_input)
 
     def test_short_post(self):
         i = self.make_input("1", content_length=2)

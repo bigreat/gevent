@@ -68,7 +68,7 @@ def process_filename(filename, output_filename=None):
         preprocessed[configuration] = preprocess_filename(filename, Config(configuration))
     preprocessed[None] = preprocess_filename(filename, None)
 
-    preprocessed = expand_to_match(preprocessed.items())
+    preprocessed = expand_to_match(list(preprocessed.items()))
     reference_pyx = preprocessed.pop(None)
 
     sources = []
@@ -242,9 +242,9 @@ def expand_to_match(items):
                 cfg2newlines[configuration].append(lines[0])
                 del lines[0]
 
-        number_of_lines = max(len(x) for x in cfg2newlines.values())
+        number_of_lines = max(len(x) for x in list(cfg2newlines.values()))
 
-        for newlines in cfg2newlines.values():
+        for newlines in list(cfg2newlines.values()):
             add = (number_of_lines - len(newlines))
             newlines.extend(['\n'] * add)
 
@@ -733,7 +733,7 @@ def combinations(iterable, r):
     indices = list(range(r))
     yield tuple(pool[i] for i in indices)
     while True:
-        for i in reversed(range(r)):
+        for i in reversed(list(range(r))):
             if indices[i] != i + n - r:
                 break
         else:

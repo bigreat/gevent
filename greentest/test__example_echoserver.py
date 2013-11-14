@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 from gevent.socket import create_connection, timeout
 from unittest import main
 import gevent

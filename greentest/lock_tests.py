@@ -1,11 +1,11 @@
 """
 Various tests for synchronization primitives.
 """
-from __future__ import with_statement
+
 
 import sys
 import time
-from thread import start_new_thread, get_ident
+from _thread import start_new_thread, get_ident
 import threading
 import unittest
 
@@ -419,7 +419,7 @@ class BaseSemaphoreTests(BaseTestCase):
 
     def test_constructor(self):
         self.assertRaises(ValueError, self.semtype, value = -1)
-        self.assertRaises(ValueError, self.semtype, value = -sys.maxint)
+        self.assertRaises(ValueError, self.semtype, value = -sys.maxsize)
 
     def test_acquire(self):
         sem = self.semtype(1)

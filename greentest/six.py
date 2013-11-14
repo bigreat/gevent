@@ -5,7 +5,7 @@ if PY3:
     advance_iterator = next
 else:
     def advance_iterator(it):
-        return it.next()
+        return next(it)
 
 if PY3:
     import builtins

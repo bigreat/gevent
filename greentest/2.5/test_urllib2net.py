@@ -5,7 +5,7 @@ from test import test_support
 from test_urllib2 import sanepathname2url
 
 import socket
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import sys
 import os
 import mimetools
@@ -21,7 +21,7 @@ class URLTimeoutTest(unittest.TestCase):
         socket.setdefaulttimeout(None)
 
     def testURLread(self):
-        f = urllib2.urlopen("http://www.python.org/")
+        f = urllib.request.urlopen("http://www.python.org/")
         x = f.read()
 
 
@@ -67,17 +67,17 @@ class AuthTests(unittest.TestCase):
 class CloseSocketTest(unittest.TestCase):
 
     def test_close(self):
-        import socket, httplib, gc
+        import socket, http.client, gc
 
         # calling .close() on urllib2's response objects should close the
         # underlying socket
 
         # delve deep into response to fetch socket._socketobject
-        response = urllib2.urlopen("http://www.python.org/")
+        response = urllib.request.urlopen("http://www.python.org/")
         abused_fileobject = response.fp
         self.assert_(abused_fileobject.__class__ is socket._fileobject)
         httpresponse = abused_fileobject._sock
-        self.assert_(httpresponse.__class__ is httplib.HTTPResponse)
+        self.assert_(httpresponse.__class__ is http.client.HTTPResponse)
         fileobject = httpresponse.fp
         self.assert_(fileobject.__class__ is socket._fileobject)
 
@@ -102,7 +102,7 @@ class urlopenNetworkTests(unittest.TestCase):
 
     def test_basic(self):
         # Simple test expected to pass.
-        open_url = urllib2.urlopen("http://www.python.org/")
+        open_url = urllib.request.urlopen("http://www.python.org/")
         for attr in ("read", "close", "info", "geturl"):
             self.assert_(hasattr(open_url, attr), "object returned from "
                             "urlopen lacks the %s attribute" % attr)
@@ -113,7 +113,7 @@ class urlopenNetworkTests(unittest.TestCase):
 
     def test_info(self):
         # Test 'info'.
-        open_url = urllib2.urlopen("http://www.python.org/")
+        open_url = urllib.request.urlopen("http://www.python.org/")
         try:
             info_obj = open_url.info()
         finally:
@@ -126,7 +126,7 @@ class urlopenNetworkTests(unittest.TestCase):
     def test_geturl(self):
         # Make sure same URL as opened is returned by geturl.
         URL = "http://www.python.org/"
-        open_url = urllib2.urlopen(URL)
+        open_url = urllib.request.urlopen(URL)
         try:
             gotten_url = open_url.geturl()
         finally:
@@ -144,7 +144,7 @@ class urlopenNetworkTests(unittest.TestCase):
                           # domain will be spared to serve its defined
                           # purpose.
                           # urllib2.urlopen, "http://www.sadflkjsasadf.com/")
-                          urllib2.urlopen, "http://www.python.invalid./")
+                          urllib.request.urlopen, "http://www.python.invalid./")
 
 
 class OtherNetworkTests(unittest.TestCase):
@@ -155,9 +155,9 @@ class OtherNetworkTests(unittest.TestCase):
             logger.addHandler(logging.StreamHandler())
 
     def test_range (self):
-        req = urllib2.Request("http://www.python.org",
+        req = urllib.request.Request("http://www.python.org",
                               headers={'Range': 'bytes=20-39'})
-        result = urllib2.urlopen(req)
+        result = urllib.request.urlopen(req)
         data = result.read()
         self.assertEqual(len(data), 20)
 
@@ -247,7 +247,7 @@ class OtherNetworkTests(unittest.TestCase):
         import logging
         debug = logging.getLogger("test_urllib2").debug
 
-        urllib2.install_opener(urllib2.build_opener(*handlers))
+        urllib.request.install_opener(urllib.request.build_opener(*handlers))
 
         for url in urls:
             if isinstance(url, tuple):
@@ -256,7 +256,7 @@ class OtherNetworkTests(unittest.TestCase):
                 req = expected_err = None
             debug(url)
             try:
-                f = urllib2.urlopen(url, req)
+                f = urllib.request.urlopen(url, req)
             except (IOError, socket.error, OSError) as err:
                 debug(err)
                 if expected_err:
@@ -275,7 +275,7 @@ class OtherNetworkTests(unittest.TestCase):
 
         handlers.append(urllib2.GopherHandler)
 
-        cfh = urllib2.CacheFTPHandler()
+        cfh = urllib.request.CacheFTPHandler()
         cfh.setTimeout(1)
         handlers.append(cfh)
 

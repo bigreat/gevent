@@ -28,11 +28,11 @@ from gevent import monkey
 monkey.patch_all()
 import sys
 try:
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
 except ImportError:
     from urllib import request as urllib2
 try:
-    import BaseHTTPServer
+    import http.server
 except ImportError:
     from http import server as BaseHTTPServer
 import gevent
@@ -47,16 +47,16 @@ class TestGreenness(greentest.TestCase):
 
     def test_urllib2(self):
         server_address = ('', 0)
-        BaseHTTPServer.BaseHTTPRequestHandler.protocol_version = "HTTP/1.0"
-        self.httpd = BaseHTTPServer.HTTPServer(server_address, BaseHTTPServer.BaseHTTPRequestHandler)
+        http.server.BaseHTTPRequestHandler.protocol_version = "HTTP/1.0"
+        self.httpd = http.server.HTTPServer(server_address, http.server.BaseHTTPRequestHandler)
         self.httpd.request_count = 0
         server = gevent.spawn(self.serve)
 
         port = self.httpd.socket.getsockname()[1]
         try:
-            urllib2.urlopen('http://127.0.0.1:%s' % port)
+            urllib.request.urlopen('http://127.0.0.1:%s' % port)
             assert False, 'should not get there'
-        except urllib2.HTTPError:
+        except urllib.error.HTTPError:
             ex = sys.exc_info()[1]
             assert ex.code == 501, repr(ex)
         server.get(0.01)

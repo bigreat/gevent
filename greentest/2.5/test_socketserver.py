@@ -5,7 +5,7 @@ from test.test_support import (verbose, verify, TESTFN, TestSkipped,
                                reap_children)
 test_support.requires('network')
 
-from SocketServer import *
+from socketserver import *
 import socket
 import errno
 import select
@@ -132,15 +132,15 @@ def testloop(proto, servers, hdlrcls, testfunc):
     for svrcls in servers:
         addr = pickaddr(proto)
         if verbose:
-            print ("ADDR =", addr)
-            print ("CLASS =", svrcls)
+            print(("ADDR =", addr))
+            print(("CLASS =", svrcls))
         t = ServerThread(addr, svrcls, hdlrcls)
         if verbose: print ("server created")
         t.start()
         if verbose: print ("server running")
         for i in range(NREQ):
             time.sleep(DELAY)
-            if verbose: print ("test client", i)
+            if verbose: print(("test client", i))
             testfunc(proto, addr)
         if verbose: print ("waiting for server")
         t.join()
@@ -158,11 +158,11 @@ class ForgivingTCPServer(TCPServer):
                 self.server_address = host, port
                 TCPServer.server_bind(self)
                 break
-            except socket.error, (err, msg):
+            except socket.error as xxx_todo_changeme:
+                (err, msg) = xxx_todo_changeme.args
                 if err != errno.EADDRINUSE:
                     raise
-                print >>sys.__stderr__, \
-                    '  WARNING: failed to listen on port %d, trying another' % port
+                print('  WARNING: failed to listen on port %d, trying another' % port, file=sys.__stderr__)
 
 tcpservers = [ForgivingTCPServer, ThreadingTCPServer]
 if hasattr(os, 'fork') and os.name not in ('os2',):

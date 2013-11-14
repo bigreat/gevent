@@ -71,7 +71,7 @@ def test_main():
 
 
 if __name__ == "__main__":
-    print (gevent.get_hub())
+    print((gevent.get_hub()))
     while True:
         test_main()
         sys.stderr.write('.')

@@ -54,14 +54,14 @@ class InterProcessSignalTests(unittest.TestCase):
     def handlerA(self, signum, frame):
         self.a_called = True
         if test_support.verbose:
-            print ("handlerA invoked from signal %s at:\n%s" % (
-                signum, self.format_frame(frame, limit=1)))
+            print(("handlerA invoked from signal %s at:\n%s" % (
+                signum, self.format_frame(frame, limit=1))))
 
     def handlerB(self, signum, frame):
         self.b_called = True
         if test_support.verbose:
-            print ("handlerB invoked from signal %s at:\n%s" % (
-                signum, self.format_frame(frame, limit=1)))
+            print(("handlerB invoked from signal %s at:\n%s" % (
+                signum, self.format_frame(frame, limit=1))))
         raise HandlerBCalled(signum, self.format_frame(frame))
 
     def wait(self, child):
@@ -89,7 +89,7 @@ class InterProcessSignalTests(unittest.TestCase):
         # Let the sub-processes know who to send signals to.
         pid = os.getpid()
         if test_support.verbose:
-            print ("test runner's pid is", pid)
+            print(("test runner's pid is", pid))
 
         child = ignoring_eintr(subprocess.Popen, ['kill', '-HUP', str(pid)])
         if child:
@@ -131,7 +131,7 @@ class InterProcessSignalTests(unittest.TestCase):
             time.sleep(1)
         except KeyboardInterrupt:
             if test_support.verbose:
-                print "KeyboardInterrupt (the alarm() went off)"
+                print("KeyboardInterrupt (the alarm() went off)")
         except:
             self.fail("Some other exception woke us from pause: %s" %
                       traceback.format_exc())
@@ -392,7 +392,7 @@ class ItimerTest(unittest.TestCase):
     def sig_alrm(self, *args):
         self.hndl_called = True
         if test_support.verbose:
-            print("SIGALRM handler invoked", args)
+            print(("SIGALRM handler invoked", args))
 
     def sig_vtalrm(self, *args):
         self.hndl_called = True
@@ -410,14 +410,14 @@ class ItimerTest(unittest.TestCase):
         self.hndl_count += 1
 
         if test_support.verbose:
-            print("SIGVTALRM handler invoked", args)
+            print(("SIGVTALRM handler invoked", args))
 
     def sig_prof(self, *args):
         self.hndl_called = True
         signal.setitimer(signal.ITIMER_PROF, 0)
 
         if test_support.verbose:
-            print("SIGPROF handler invoked", args)
+            print(("SIGPROF handler invoked", args))
 
     def test_itimer_exc(self):
         # XXX I'm assuming -1 is an invalid itimer, but maybe some platform

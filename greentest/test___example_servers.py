@@ -4,7 +4,7 @@ from unittest import main
 if sys.version_info[0] == 3:
     from urllib import request as urllib2
 else:
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
 
 import util
 
@@ -17,8 +17,8 @@ class Test_wsgiserver(util.TestServer):
     def read(self, path='/'):
         url = self.URL + path
         try:
-            response = urllib2.urlopen(url)
-        except urllib2.HTTPError:
+            response = urllib.request.urlopen(url)
+        except urllib.error.HTTPError:
             response = sys.exc_info()[1]
         return '%s %s' % (response.code, response.msg), response.read()
 

@@ -37,26 +37,26 @@ class TestThread(threading.Thread):
     def run(self):
         delay = random.random() / 10000.0
         if verbose:
-            print ('task %s will run for %.1f usec' % (
-                self.name, delay * 1e6))
+            print(('task %s will run for %.1f usec' % (
+                self.name, delay * 1e6)))
 
         with self.sema:
             with self.mutex:
                 self.nrunning.inc()
                 if verbose:
-                    print (self.nrunning.get(), 'tasks are running')
+                    print((self.nrunning.get(), 'tasks are running'))
                 self.testcase.assertTrue(self.nrunning.get() <= 3)
 
             time.sleep(delay)
             if verbose:
-                print ('task', self.name, 'done')
+                print(('task', self.name, 'done'))
 
             with self.mutex:
                 self.nrunning.dec()
                 self.testcase.assertTrue(self.nrunning.get() >= 0)
                 if verbose:
-                    print ('%s is finished. %d tasks are running' % (
-                        self.name, self.nrunning.get()))
+                    print(('%s is finished. %d tasks are running' % (
+                        self.name, self.nrunning.get())))
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):

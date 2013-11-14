@@ -1,5 +1,5 @@
 # Copyright (c) 2009-2011 Denis Bilenko. See LICENSE for details.
-from __future__ import absolute_import
+
 import sys
 from gevent.timeout import Timeout
 from gevent.event import Event

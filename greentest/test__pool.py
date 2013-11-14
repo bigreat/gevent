@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 from time import time
 import gevent
 from gevent import pool
@@ -247,8 +247,8 @@ class TestPool(greentest.TestCase):
 
     def test_map(self):
         pmap = self.pool.map
-        self.assertEqual(pmap(sqr, range(10)), list(map(squared, range(10))))
-        self.assertEqual(pmap(sqr, range(100)), list(map(squared, range(100))))
+        self.assertEqual(pmap(sqr, list(range(10))), list(map(squared, list(range(10)))))
+        self.assertEqual(pmap(sqr, list(range(100))), list(map(squared, list(range(100)))))
 
     def test_async(self):
         res = self.pool.apply_async(sqr, (7, TIMEOUT1,))
@@ -273,33 +273,33 @@ class TestPool(greentest.TestCase):
         self.pool.join()
 
     def test_imap(self):
-        it = self.pool.imap(sqr, range(10))
-        self.assertEqual(list(it), list(map(squared, range(10))))
+        it = self.pool.imap(sqr, list(range(10)))
+        self.assertEqual(list(it), list(map(squared, list(range(10)))))
 
-        it = self.pool.imap(sqr, range(10))
+        it = self.pool.imap(sqr, list(range(10)))
         for i in range(10):
             self.assertEqual(six.advance_iterator(it), i * i)
         self.assertRaises(StopIteration, lambda: six.advance_iterator(it))
 
-        it = self.pool.imap(sqr, range(1000))
+        it = self.pool.imap(sqr, list(range(1000)))
         for i in range(1000):
             self.assertEqual(six.advance_iterator(it), i * i)
         self.assertRaises(StopIteration, lambda: six.advance_iterator(it))
 
     def test_imap_random(self):
-        it = self.pool.imap(sqr_random_sleep, range(10))
-        self.assertEqual(list(it), list(map(squared, range(10))))
+        it = self.pool.imap(sqr_random_sleep, list(range(10)))
+        self.assertEqual(list(it), list(map(squared, list(range(10)))))
 
     def test_imap_unordered(self):
-        it = self.pool.imap_unordered(sqr, range(1000))
-        self.assertEqual(sorted(it), list(map(squared, range(1000))))
+        it = self.pool.imap_unordered(sqr, list(range(1000)))
+        self.assertEqual(sorted(it), list(map(squared, list(range(1000)))))
 
-        it = self.pool.imap_unordered(sqr, range(1000))
-        self.assertEqual(sorted(it), list(map(squared, range(1000))))
+        it = self.pool.imap_unordered(sqr, list(range(1000)))
+        self.assertEqual(sorted(it), list(map(squared, list(range(1000)))))
 
     def test_imap_unordered_random(self):
-        it = self.pool.imap_unordered(sqr_random_sleep, range(10))
-        self.assertEqual(sorted(it), list(map(squared, range(10))))
+        it = self.pool.imap_unordered(sqr_random_sleep, list(range(10)))
+        self.assertEqual(sorted(it), list(map(squared, list(range(10)))))
 
     def test_empty(self):
         it = self.pool.imap_unordered(sqr, [])
@@ -431,17 +431,17 @@ class TestErrorInHandler(greentest.TestCase):
         p = pool.Pool(1)
         it = p.imap(divide_by, [1, 0, 2])
         self.assertEqual(next(it), 1.0)
-        self.assertRaises(ZeroDivisionError, it.next)
+        self.assertRaises(ZeroDivisionError, it.__next__)
         self.assertEqual(next(it), 0.5)
-        self.assertRaises(StopIteration, it.next)
+        self.assertRaises(StopIteration, it.__next__)
 
     def test_imap_unordered(self):
         p = pool.Pool(1)
         it = p.imap_unordered(divide_by, [1, 0, 2])
         self.assertEqual(next(it), 1.0)
-        self.assertRaises(ZeroDivisionError, it.next)
+        self.assertRaises(ZeroDivisionError, it.__next__)
         self.assertEqual(next(it), 0.5)
-        self.assertRaises(StopIteration, it.next)
+        self.assertRaises(StopIteration, it.__next__)
 
 
 if __name__ == '__main__':

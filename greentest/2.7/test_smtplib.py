@@ -3,7 +3,7 @@ import email.utils
 import socket
 import smtpd
 import smtplib
-import StringIO
+import io
 import sys
 import time
 import select
@@ -149,7 +149,7 @@ class DebuggingServerTests(unittest.TestCase):
     def setUp(self):
         # temporarily replace sys.stdout to capture DebuggingServer output
         self.old_stdout = sys.stdout
-        self.output = StringIO.StringIO()
+        self.output = io.StringIO()
         sys.stdout = self.output
 
         self._threads = test_support.threading_setup()
@@ -267,7 +267,7 @@ class BadHELOServerTests(unittest.TestCase):
 
     def setUp(self):
         self.old_stdout = sys.stdout
-        self.output = StringIO.StringIO()
+        self.output = io.StringIO()
         sys.stdout = self.output
 
         self._threads = test_support.threading_setup()
@@ -448,7 +448,7 @@ class SMTPSimTests(unittest.TestCase):
     def testVRFY(self):
         smtp = smtplib.SMTP(HOST, self.port, local_hostname='localhost', timeout=15)
 
-        for email, name in sim_users.items():
+        for email, name in list(sim_users.items()):
             expected_known = (250, '%s %s' % (name, smtplib.quoteaddr(email)))
             self.assertEqual(smtp.vrfy(email), expected_known)
 
@@ -460,7 +460,7 @@ class SMTPSimTests(unittest.TestCase):
     def testEXPN(self):
         smtp = smtplib.SMTP(HOST, self.port, local_hostname='localhost', timeout=15)
 
-        for listname, members in sim_lists.items():
+        for listname, members in list(sim_lists.items()):
             users = []
             for m in members:
                 users.append('%s %s' % (sim_users[m], smtplib.quoteaddr(m)))

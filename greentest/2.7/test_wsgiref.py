@@ -1,4 +1,4 @@
-from __future__ import nested_scopes    # Backward compat for 2.1
+    # Backward compat for 2.1
 from unittest import TestCase
 from wsgiref.util import setup_testing_defaults
 from wsgiref.headers import Headers
@@ -7,8 +7,8 @@ from wsgiref import util
 from wsgiref.validate import validator
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, demo_app
 from wsgiref.simple_server import make_server
-from StringIO import StringIO
-from SocketServer import BaseServer
+from io import StringIO
+from socketserver import BaseServer
 import os
 import re
 import sys
@@ -339,10 +339,10 @@ class HeaderTests(TestCase):
         test = [('x','y')]
         self.assertEqual(len(Headers([])),0)
         self.assertEqual(len(Headers(test[:])),1)
-        self.assertEqual(Headers(test[:]).keys(), ['x'])
-        self.assertEqual(Headers(test[:]).values(), ['y'])
-        self.assertEqual(Headers(test[:]).items(), test)
-        self.assertFalse(Headers(test).items() is test)  # must be copy!
+        self.assertEqual(list(Headers(test[:]).keys()), ['x'])
+        self.assertEqual(list(Headers(test[:]).values()), ['y'])
+        self.assertEqual(list(Headers(test[:]).items()), test)
+        self.assertFalse(list(Headers(test).items()) is test)  # must be copy!
 
         h=Headers([])
         del h['foo']   # should not raise an error
@@ -395,7 +395,7 @@ class ErrorHandler(BaseCGIHandler):
     # BaseHandler records the OS environment at import time, but envvars
     # might have been changed later by other tests, which trips up
     # HandlerTests.testEnviron().
-    os_environ = dict(os.environ.items())
+    os_environ = dict(list(os.environ.items()))
 
     def __init__(self,**kw):
         setup_testing_defaults(kw)
@@ -435,10 +435,10 @@ class HandlerTests(TestCase):
         empty = {}; setup_testing_defaults(empty)
         env = handler.environ
         from os import environ
-        for k,v in environ.items():
+        for k,v in list(environ.items()):
             if k not in empty:
                 self.assertEqual(env[k],v)
-        for k,v in empty.items():
+        for k,v in list(empty.items()):
             self.assertIn(k, env)
 
     def testEnviron(self):

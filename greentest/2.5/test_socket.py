@@ -6,8 +6,8 @@ from test import test_support
 import socket
 import select
 import time
-import thread, threading
-import Queue
+import _thread, threading
+import queue
 import sys
 import array
 from weakref import proxy
@@ -98,14 +98,14 @@ class ThreadableTest:
         self.server_ready = threading.Event()
         self.client_ready = threading.Event()
         self.done = threading.Event()
-        self.queue = Queue.Queue(1)
+        self.queue = queue.Queue(1)
 
         # Do some munging to start the client test.
         methodname = self.id()
         i = methodname.rfind('.')
         methodname = methodname[i+1:]
         test_method = getattr(self, '_' + methodname)
-        self.client_thread = thread.start_new_thread(
+        self.client_thread = _thread.start_new_thread(
             self.clientRun, (test_method,))
 
         self.__setUp()
@@ -129,16 +129,16 @@ class ThreadableTest:
             raise TypeError("test_func must be a callable function")
         try:
             test_func()
-        except Exception, strerror:
+        except Exception as strerror:
             self.queue.put(strerror)
         self.clientTearDown()
 
     def clientSetUp(self):
-        raise NotImplementedError, "clientSetUp must be implemented."
+        raise NotImplementedError("clientSetUp must be implemented.")
 
     def clientTearDown(self):
         self.done.set()
-        thread.exit()
+        _thread.exit()
 
 class ThreadedTCPSocketTest(SocketTCPTest, ThreadableTest):
 
@@ -301,14 +301,14 @@ class GeneralModuleTests(unittest.TestCase):
         # when looking at the lower 16 or 32 bits.
         sizes = {socket.htonl: 32, socket.ntohl: 32,
                  socket.htons: 16, socket.ntohs: 16}
-        for func, size in sizes.items():
-            mask = (1L<<size) - 1
+        for func, size in list(sizes.items()):
+            mask = (1<<size) - 1
             for i in (0, 1, 0xffff, ~0xffff, 2, 0x01234567, 0x76543210):
                 self.assertEqual(i & mask, func(func(i&mask)) & mask)
 
             swapped = func(mask)
             self.assertEqual(swapped & mask, mask)
-            self.assertRaises(OverflowError, func, 1L<<34)
+            self.assertRaises(OverflowError, func, 1<<34)
 
     def testGetServBy(self):
         eq = self.assertEqual

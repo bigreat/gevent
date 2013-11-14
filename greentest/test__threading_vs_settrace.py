@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 
 import sys
 import subprocess
@@ -57,7 +57,7 @@ class ThreadTrace(unittest.TestCase):
         try:
             def trace(frame, ev, arg):
                 lst.append((frame.f_code.co_filename, frame.f_lineno, ev))
-                print ("TRACE: %s:%s %s" % lst[-1])
+                print(("TRACE: %s:%s %s" % lst[-1]))
                 return trace
 
             with gevent.thread.allocate_lock():

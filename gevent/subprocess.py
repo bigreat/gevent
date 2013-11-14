@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 import sys
 import os
 import errno
@@ -401,7 +401,7 @@ class Popen(object):
                            errread, errwrite):
             """Execute program (MS Windows version)"""
 
-            if not isinstance(args, types.StringTypes):
+            if not isinstance(args, str):
                 args = list2cmdline(args)
 
             # Process startup details
@@ -617,7 +617,7 @@ class Popen(object):
                            errread, errwrite):
             """Execute program (POSIX version)"""
 
-            if isinstance(args, types.StringTypes):
+            if isinstance(args, str):
                 args = [args]
             else:
                 args = list(args)

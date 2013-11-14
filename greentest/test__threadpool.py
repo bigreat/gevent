@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 import sys
 from time import time, sleep
 import random
@@ -95,8 +95,8 @@ class TestPool(TestCase):
 
     def test_map(self):
         pmap = self.pool.map
-        self.assertEqual(pmap(sqr, range(10)), list(map(sqr, range(10))))
-        self.assertEqual(pmap(sqr, range(100)), list(map(sqr, range(100))))
+        self.assertEqual(pmap(sqr, list(range(10))), list(map(sqr, list(range(10)))))
+        self.assertEqual(pmap(sqr, list(range(100))), list(map(sqr, list(range(100)))))
 
     def test_async(self):
         res = self.pool.apply_async(sqr, (7, TIMEOUT1,))
@@ -121,33 +121,33 @@ class TestPool(TestCase):
         self.pool.join()
 
     def test_imap(self):
-        it = self.pool.imap(sqr, range(10))
-        self.assertEqual(list(it), list(map(sqr, range(10))))
+        it = self.pool.imap(sqr, list(range(10)))
+        self.assertEqual(list(it), list(map(sqr, list(range(10)))))
 
-        it = self.pool.imap(sqr, range(10))
+        it = self.pool.imap(sqr, list(range(10)))
         for i in range(10):
             self.assertEqual(six.advance_iterator(it), i * i)
         self.assertRaises(StopIteration, lambda: six.advance_iterator(it))
 
-        it = self.pool.imap(sqr, range(1000))
+        it = self.pool.imap(sqr, list(range(1000)))
         for i in range(1000):
             self.assertEqual(six.advance_iterator(it), i * i)
         self.assertRaises(StopIteration, lambda: six.advance_iterator(it))
 
     def test_imap_random(self):
-        it = self.pool.imap(sqr_random_sleep, range(10))
-        self.assertEqual(list(it), list(map(sqr, range(10))))
+        it = self.pool.imap(sqr_random_sleep, list(range(10)))
+        self.assertEqual(list(it), list(map(sqr, list(range(10)))))
 
     def test_imap_unordered(self):
-        it = self.pool.imap_unordered(sqr, range(1000))
-        self.assertEqual(sorted(it), list(map(sqr, range(1000))))
+        it = self.pool.imap_unordered(sqr, list(range(1000)))
+        self.assertEqual(sorted(it), list(map(sqr, list(range(1000)))))
 
-        it = self.pool.imap_unordered(sqr, range(1000))
-        self.assertEqual(sorted(it), list(map(sqr, range(1000))))
+        it = self.pool.imap_unordered(sqr, list(range(1000)))
+        self.assertEqual(sorted(it), list(map(sqr, list(range(1000)))))
 
     def test_imap_unordered_random(self):
-        it = self.pool.imap_unordered(sqr_random_sleep, range(10))
-        self.assertEqual(sorted(it), list(map(sqr, range(10))))
+        it = self.pool.imap_unordered(sqr_random_sleep, list(range(10)))
+        self.assertEqual(sorted(it), list(map(sqr, list(range(10)))))
 
     def test_terminate(self):
         result = self.pool.map_async(sleep, [0.1] * ((self.size or 10) * 2))

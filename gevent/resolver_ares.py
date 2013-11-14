@@ -1,5 +1,5 @@
 # Copyright (c) 2011 Denis Bilenko. See LICENSE for details.
-from __future__ import absolute_import
+
 import os
 import sys
 from _socket import getservbyname, getaddrinfo, gaierror, error
@@ -20,7 +20,7 @@ class Resolver(object):
             hub = get_hub()
         self.hub = hub
         if use_environ:
-            for key in os.environ.keys():
+            for key in list(os.environ.keys()):
                 if key.startswith('GEVENTARES_'):
                     name = key[11:].lower()
                     if name:
@@ -53,7 +53,7 @@ class Resolver(object):
         return self.gethostbyname_ex(hostname, family)[-1][0]
 
     def gethostbyname_ex(self, hostname, family=AF_INET):
-        if isinstance(hostname, unicode):
+        if isinstance(hostname, str):
             hostname = hostname.encode('ascii')
         elif not isinstance(hostname, str):
             raise TypeError('Expected string, not %s' % type(hostname).__name__)
@@ -119,7 +119,7 @@ class Resolver(object):
         return port, socktypes
 
     def _getaddrinfo(self, host, port, family=0, socktype=0, proto=0, flags=0):
-        if isinstance(host, unicode):
+        if isinstance(host, str):
             host = host.encode('idna')
         elif not isinstance(host, str) or (flags & AI_NUMERICHOST):
             # this handles cases which do not require network access
@@ -193,7 +193,7 @@ class Resolver(object):
                     raise
 
     def _gethostbyaddr(self, ip_address):
-        if isinstance(ip_address, unicode):
+        if isinstance(ip_address, str):
             ip_address = ip_address.encode('ascii')
         elif not isinstance(ip_address, str):
             raise TypeError('Expected string, not %s' % type(ip_address).__name__)
@@ -230,7 +230,7 @@ class Resolver(object):
             raise TypeError('getnameinfo() argument 1 must be a tuple')
 
         address = sockaddr[0]
-        if isinstance(address, unicode):
+        if isinstance(address, str):
             address = address.encode('ascii')
 
         if not isinstance(address, str):

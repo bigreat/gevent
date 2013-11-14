@@ -4,16 +4,16 @@ Written by Cody A.W. Somerville <cody-somerville@ubuntu.com>,
 Josip Dzolonga, and Michael Otteneder for the 2007/08 GHOP contest.
 """
 
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-from CGIHTTPServer import CGIHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import SimpleHTTPRequestHandler
+from http.server import CGIHTTPRequestHandler
 
 import os
 import sys
 import base64
 import shutil
-import urllib
-import httplib
+import urllib.request, urllib.parse, urllib.error
+import http.client
 import tempfile
 import threading
 
@@ -58,7 +58,7 @@ class BaseTestCase(unittest.TestCase):
         self.thread.stop()
 
     def request(self, uri, method='GET', body=None, headers={}):
-        self.connection = httplib.HTTPConnection('localhost', self.PORT)
+        self.connection = http.client.HTTPConnection('localhost', self.PORT)
         self.connection.request(method, uri, body, headers)
         return self.connection.getresponse()
 
@@ -91,7 +91,7 @@ class BaseHTTPServerTestCase(BaseTestCase):
 
     def setUp(self):
         BaseTestCase.setUp(self)
-        self.con = httplib.HTTPConnection('localhost', self.PORT)
+        self.con = http.client.HTTPConnection('localhost', self.PORT)
         self.con.connect()
 
     def test_command(self):
@@ -240,7 +240,7 @@ class SimpleHTTPServerTestCase(BaseTestCase):
             os.chmod(self.tempdir, 0)
             response = self.request(self.tempdir_name + '/')
             self.check_status_and_reason(response, 404)
-            os.chmod(self.tempdir, 0755)
+            os.chmod(self.tempdir, 0o755)
 
     def test_head(self):
         response = self.request(
@@ -302,12 +302,12 @@ class CGIHTTPServerTestCase(BaseTestCase):
         self.file1_path = os.path.join(self.cgi_dir, 'file1.py')
         with open(self.file1_path, 'w') as file1:
             file1.write(cgi_file1 % self.pythonexe)
-        os.chmod(self.file1_path, 0777)
+        os.chmod(self.file1_path, 0o777)
 
         self.file2_path = os.path.join(self.cgi_dir, 'file2.py')
         with open(self.file2_path, 'w') as file2:
             file2.write(cgi_file2 % self.pythonexe)
-        os.chmod(self.file2_path, 0777)
+        os.chmod(self.file2_path, 0o777)
 
         self.cwd = os.getcwd()
         os.chdir(self.parent_dir)
@@ -330,7 +330,7 @@ class CGIHTTPServerTestCase(BaseTestCase):
              (res.read(), res.getheader('Content-type'), res.status))
 
     def test_post(self):
-        params = urllib.urlencode({'spam' : 1, 'eggs' : 'python', 'bacon' : 123456})
+        params = urllib.parse.urlencode({'spam' : 1, 'eggs' : 'python', 'bacon' : 123456})
         headers = {'Content-type' : 'application/x-www-form-urlencoded'}
         res = self.request('/cgi-bin/file2.py', 'POST', params, headers)
 

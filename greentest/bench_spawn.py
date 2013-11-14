@@ -29,13 +29,13 @@ def test(spawn, sleep, kwargs):
     for _ in range(N):
         spawn(incr, sleep, **kwargs)
     delta = time() - start
-    print ('spawning: %.1f microseconds per greenlet' % (delta * 1000000.0 / N))
+    print(('spawning: %.1f microseconds per greenlet' % (delta * 1000000.0 / N)))
     assert counter == 0, counter
     start = time()
     sleep(0)
     delta = time() - start
     assert counter == N, (counter, N)
-    print ('sleep(0): %.1f microseconds per greenlet' % (delta * 1000000.0 / N))
+    print(('sleep(0): %.1f microseconds per greenlet' % (delta * 1000000.0 / N)))
 
 
 def bench_none(options):
@@ -45,26 +45,26 @@ def bench_none(options):
         incr(noop, **kwargs)
     delta = time() - start
     assert counter == N, (counter, N)
-    print ('%.2f microseconds' % (delta * 1000000.0 / N))
+    print(('%.2f microseconds' % (delta * 1000000.0 / N)))
 
 
 def bench_gevent(options):
     import gevent
-    print ('using gevent from %s' % gevent.__file__)
+    print(('using gevent from %s' % gevent.__file__))
     from gevent import spawn, sleep
     test(spawn, sleep, options.kwargs)
 
 
 def bench_geventraw(options):
     import gevent
-    print ('using gevent from %s' % gevent.__file__)
+    print(('using gevent from %s' % gevent.__file__))
     from gevent import sleep, spawn_raw
     test(spawn_raw, sleep, options.kwargs)
 
 
 def bench_geventpool(options):
     import gevent
-    print ('using gevent from %s' % gevent.__file__)
+    print(('using gevent from %s' % gevent.__file__))
     from gevent import sleep
     from gevent.pool import Pool
     p = Pool()
@@ -72,7 +72,7 @@ def bench_geventpool(options):
     start = time()
     p.join()
     delta = time() - start
-    print ('joining: %.1f microseconds per greenlet' % (delta * 1000000.0 / N))
+    print(('joining: %.1f microseconds per greenlet' % (delta * 1000000.0 / N)))
 
 
 def bench_eventlet(options):
@@ -82,7 +82,7 @@ def bench_eventlet(options):
         if options.ignore_import_errors:
             return
         raise
-    print ('using eventlet from %s' % eventlet.__file__)
+    print(('using eventlet from %s' % eventlet.__file__))
     from eventlet.api import spawn, sleep, use_hub
     if options.eventlet_hub is not None:
         use_hub(options.eventlet_hub)
@@ -96,7 +96,7 @@ def bench_eventlet1(options):
         if options.ignore_import_errors:
             return
         raise
-    print ('using eventlet from %s' % eventlet.__file__)
+    print(('using eventlet from %s' % eventlet.__file__))
     from eventlet.proc import spawn_greenlet as spawn
     from eventlet.api import sleep, use_hub
     if options.eventlet_hub:
@@ -119,7 +119,7 @@ def bench_all(options):
         time.sleep(0.01)
         if os.system(cmd):
             error = 1
-            print ('%s failed' % cmd)
+            print(('%s failed' % cmd))
         print ('')
     for func in names:
         cmd = '%s %s --with-kwargs %s --ignore-import-errors' % (sys.executable, __file__, func)
@@ -127,7 +127,7 @@ def bench_all(options):
         sys.stdout.flush()
         if os.system(cmd):
             error = 1
-            print ('%s failed' % cmd)
+            print(('%s failed' % cmd))
         print ('')
     if error:
         sys.exit(1)
@@ -136,7 +136,7 @@ def bench_all(options):
 def all():
     result = [x for x in globals() if x.startswith('bench_') and x != 'bench_all']
     try:
-        result.sort(key=lambda x: globals()[x].func_code.co_firstlineno)
+        result.sort(key=lambda x: globals()[x].__code__.co_firstlineno)
     except AttributeError:
         result.sort(key=lambda x: globals()[x].__code__.co_firstlineno)
     result = [x.replace('bench_', '') for x in result]

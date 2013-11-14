@@ -53,8 +53,8 @@ source_suffix = '.rst'
 master_doc = 'contents'
 
 # General information about the project.
-project = u'gevent'
-copyright = u'2009-2011, gevent contributors'
+project = 'gevent'
+copyright = '2009-2011, gevent contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -190,8 +190,8 @@ htmlhelp_basename = 'geventdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'gevent.tex', u'gevent Documentation',
-     u'gevent contributors', 'manual'),
+    ('index', 'gevent.tex', 'gevent Documentation',
+     'gevent contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -235,9 +235,10 @@ class MyClassDocumenter(ClassDocumenter):
     def get_object_members(self, want_all):
         members_check_module, members = super(MyClassDocumenter, self).get_object_members(want_all)
 
-        def key((name, obj)):
+        def key(xxx_todo_changeme):
+            (name, obj) = xxx_todo_changeme
             try:
-                return obj.__func__.func_code.co_firstlineno
+                return obj.__func__.__code__.co_firstlineno
             except AttributeError:
                 return 0
         members.sort(key=key)

@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 from gevent import monkey; monkey.patch_all()
 import sys
 import socket
@@ -26,7 +26,7 @@ class Test(util.TestServer):
         def handle(socket, address):
             while True:
                 data = socket.recv(1024)
-                print ('got %r' % data)
+                print(('got %r' % data))
                 if not data:
                     break
                 log.append(data)
